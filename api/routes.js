@@ -9,36 +9,80 @@ export const router = new Router()
 
 //listar os tweets
 router.get('/tweets', async ctx => {
-  const tweets = await prisma.tweet.findMany()
+  const [, token] = ctx.request.headers?.authorization?.split(' ') || []
 
-  ctx.body = tweets
+  if (!token) {
+    ctx.status = 401
+    return
+  }
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET)
+
+    const tweets = await prisma.tweet.findMany()
+
+    ctx.body = tweets
+  } catch (error) {
+    ctx.status = 401
+    return
+  }
 })
 
 // receber e salvar o tweet
 router.post('/tweet', async ctx => {
-  const userId = 'cl3xgs3yg0015axur550clzv2'
+  const [, token] = ctx.request.headers?.authorization?.split(' ') || []
 
-  const tweet = {
-    userId: userId,
-    text: ctx.request.body.text
+  if (!token) {
+    ctx.status = 401
+    return
   }
 
-  const doc = await prisma.tweet.create({
-    data: tweet
-  })
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET)
 
-  ctx.body = doc
+    const user = await prisma.user.findUnique({
+      where: {
+        id: payload.sub
+      }
+    })
+
+    const tweet = await prisma.tweet.create({
+      data: {
+        userId: user.id,
+        text: ctx.request.body.text,
+        likes: 0
+      }
+    })
+
+    ctx.body = tweet
+  } catch (error) {
+    ctx.status = 401
+    return
+  }
 })
 
 // deletar o tweet
 router.delete('/tweet/:id', async ctx => {
-  const deleted = await prisma.tweet.delete({
-    where: {
-      id: ctx.params.id
-    }
-  })
+  const [, token] = ctx.request.headers?.authorization?.split(' ') || []
 
-  ctx.body = deleted
+  if (!token) {
+    ctx.status = 401
+    return
+  }
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET)
+    const deleted = await prisma.tweet.delete({
+      where: {
+        id: ctx.params.id
+      }
+    })
+
+    ctx.body = deleted
+  } catch (error) {
+    ctx.status = 401
+    return
+  }
 })
 
 //rota de cadastro
