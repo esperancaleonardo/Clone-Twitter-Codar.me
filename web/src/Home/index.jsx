@@ -1,16 +1,26 @@
 import { Heart } from "phosphor-react";
 import { useState, useEffect } from "react";
+import { useFormik } from "formik";
 import axios from 'axios'
 
 const MAX_CHAR_TWEET = 180
 
-function TweetForm() {
-  const [text, setText] = useState('');
+function TweetForm({loggedInUser, onSuccess}) {
+    
+  const formik = useFormik({
+    onSubmit: async (values, form) => {
+      await axios({
+        method: 'post',
+        url: `http://localhost:9000/tweet`,
+        headers:{'authorization': `Bearer ${loggedInUser.accessToken}`},
+        data: {text: values.text},
+      })
 
-  function changeText(e) {
-    setText(e.target.value)
-
-  }
+      form.setFieldValue('text', '')
+      onSuccess()
+    },
+    initialValues: {text: ''}
+  })
 
   return (
     <>
@@ -19,22 +29,23 @@ function TweetForm() {
           <img src='./src/avatar.png' className="w-7" />
           <h1 className="font-bold text-xl">Página Inicial</h1>
         </div>
-
-        <form className="pl-12 text-lg flex flex-col">
+        <form className="pl-12 text-lg flex flex-col" onSubmit={formik.handleSubmit}>
           <textarea
-            type="text"
-            value={text}
-            onChange={changeText}
-            name="tweet"
+            name="text"
+            value={formik.values.text}
             placeholder="O que está acontecendo?"
             className="bg-transparent focus:border-birdBlue focus:ring-0 disabled:opacity-50 h-32 resize-none scrollbar-thin scrollbar-thumb-birdBlue scrollbar-track-silver mb-4"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            disabled={formik.isSubmitting}
            />
           
           <div className="flex justify-end items-center space-x-3">
-            <span className="text-sm"><span>{text.length}</span><span className="text-birdBlue">/{MAX_CHAR_TWEET}</span></span>
+            <span className="text-sm"><span>{formik.values.text.length}</span><span className="text-birdBlue">/{MAX_CHAR_TWEET}</span></span>
             <button
+              type="submit"
               className="bg-birdBlue px-5 py-2 rounded-full disabled:opacity-50"
-              disabled={text.length > MAX_CHAR_TWEET}>Tweetar</button>
+              disabled={formik.values.text.length > MAX_CHAR_TWEET || formik.isSubmitting}>Tweetar</button>
          </div>
         </form>
       </div>
@@ -51,6 +62,7 @@ function Tweet({ name, username, avatar, tweet, likes }) {
       <div className="space-y-1">
         <span className="font-bold text-sm">{name}</span>{' '}
         <span className="text-sm text-silver">@{username}</span>
+        
         <p>{tweet}</p>
         <div className="flex space-x-1 text-silver text-sm items-center">
           <Heart className="h-4 stroke-1" />
@@ -82,17 +94,22 @@ export function Home({loggedInUser}) {
   
   return (
     <>
-      <TweetForm />
+      <TweetForm loggedInUser={loggedInUser} onSuccess={fetchData} />
       <div>
-        {data.length && data.map(tweet => (
-          <Tweet
-            key={tweet.id}
-            name={tweet.user.name}
-            username={tweet.user.username}
-            avatar='./src/avatar.png'
-            tweet={tweet.text}
-            likes={tweet.likes} />
-        ))}
+        {data.length > 0
+          ? data.map(tweet => (
+              <Tweet
+                key={tweet.id}
+                name={tweet.user.name}
+                username={tweet.user.username}
+                avatar='./src/avatar.png'
+                tweet={tweet.text}
+                likes={tweet.likes} />
+            ))
+          : <div className="flex justify-center items-center w-full p-12">
+              <h1 className="text-3xl ">Ops! Ainda não há tweets!</h1>
+            </div>
+        }
       </div>
       
     </>
