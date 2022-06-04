@@ -23,7 +23,7 @@ export function Signup({ signInUser }) {
   const formik = useFormik({
     onSubmit: async values => {
       try {
-        const res = await axios.post('http://localhost:9000/signup', {
+        const res = await axios.post(`${import.meta.env.VITE_API_HOST}/signup`, {
           username: values.username,
           name: values.name,
           email: values.email,
