@@ -1,7 +1,8 @@
 import { Heart } from "phosphor-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from 'axios'
 
- const MAX_CHAR_TWEET = 180
+const MAX_CHAR_TWEET = 180
 
 function TweetForm() {
   const [text, setText] = useState('');
@@ -41,7 +42,7 @@ function TweetForm() {
   )
 }
 
-function Tweet({ name, username, avatar, tweet }) {
+function Tweet({ name, username, avatar, tweet, likes }) {
   return (
     <div className="flex space-x-3 p-4 border-b border-silver">
       <div>
@@ -53,7 +54,7 @@ function Tweet({ name, username, avatar, tweet }) {
         <p>{tweet}</p>
         <div className="flex space-x-1 text-silver text-sm items-center">
           <Heart className="h-4 stroke-1" />
-          <span>1.2K</span>
+          <span>{likes}</span>
         </div>
       </div>
     </div>
@@ -63,13 +64,36 @@ function Tweet({ name, username, avatar, tweet }) {
 
 
 export function Home() {
+  const token = ''
+  const [data, setData] = useState('')
 
+  async function fetchData() {
+    const res = await axios.get('http://localhost:9000/tweets', {
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    })
+    setData(res.data)
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+  
+  
   return (
     <>
       <TweetForm />
       <div>
-        <Tweet name='Elon Musk' username='elonmusk' avatar='./src/avatar.png' tweet='Let’s make Twitter maximun fun!' />
-        <Tweet name='Leonardo Esperança' username='odranoel' avatar='./src/avatar.png' tweet='Let’s make Twitter maximun speed!' />
+        {data.length && data.map(tweet => (
+          <Tweet
+            key={btoa(Date.now() + '_' + tweet.text)}
+            name={tweet.user.name}
+            username={tweet.user.username}
+            avatar='./src/avatar.png'
+            tweet={tweet.text}
+            likes={tweet.likes} />
+        ))}
       </div>
       
     </>
