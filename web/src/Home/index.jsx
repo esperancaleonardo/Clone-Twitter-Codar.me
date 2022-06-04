@@ -1,7 +1,5 @@
 import { Heart } from "phosphor-react";
-import { useState, useEffect } from "react";
-import axios from 'axios'
-
+import { useState } from "react";
 
  const MAX_CHAR_TWEET = 180
 
@@ -43,8 +41,7 @@ function TweetForm() {
   )
 }
 
-function Tweet({ name, username, avatar, tweet, likes }) {
-  
+function Tweet({ name, username, avatar, tweet }) {
   return (
     <div className="flex space-x-3 p-4 border-b border-silver">
       <div>
@@ -56,7 +53,7 @@ function Tweet({ name, username, avatar, tweet, likes }) {
         <p>{tweet}</p>
         <div className="flex space-x-1 text-silver text-sm items-center">
           <Heart className="h-4 stroke-1" />
-          <span>{likes}</span>
+          <span>1.2K</span>
         </div>
       </div>
     </div>
@@ -66,36 +63,13 @@ function Tweet({ name, username, avatar, tweet, likes }) {
 
 
 export function Home() {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbDN5eXk3M3cwMDAyMXB1cms1aTFqN3BqIiwiaWF0IjoxNjU0MzU1MzAzLCJleHAiOjE2NTQ0NDE3MDN9.Ie1PxJ0AeIK_XxwCPCoYRWDYGKYN2lMrQDt46ABMGdQ'
-  const [data, setData] = useState('')
-
-  async function fetchData() {
-    const res = await axios.get('http://localhost:9000/tweets', {
-      headers: {
-        authorization: `Bearer ${token}`
-      }
-    })
-    setData(res.data)
-  }
-
-  useEffect(() => {
-    fetchData()
-  }, [])
-
 
   return (
     <>
       <TweetForm />
       <div>
-        {data.length && data.map(tweet => (
-          <Tweet
-            key={btoa(Date.now() + '_' + tweet.text)}
-            name={tweet.user.name}
-            username={tweet.user.username}
-            avatar='./src/avatar.png'
-            tweet={tweet.text}
-            likes={tweet.likes} />
-        ))}        
+        <Tweet name='Elon Musk' username='elonmusk' avatar='./src/avatar.png' tweet='Let’s make Twitter maximun fun!' />
+        <Tweet name='Leonardo Esperança' username='odranoel' avatar='./src/avatar.png' tweet='Let’s make Twitter maximun speed!' />
       </div>
       
     </>
