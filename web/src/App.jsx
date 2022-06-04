@@ -9,7 +9,7 @@ export function App() {
   const [user, setUser] = useState()
 
   if (user) {
-    return <Home loggedInUser={user}/>
+    return <Home loggedInUser={user} setUser={setUser}/>
   }
 
   //retornar uma pagina de 404 

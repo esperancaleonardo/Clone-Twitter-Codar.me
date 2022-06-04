@@ -1,11 +1,11 @@
-import { Heart } from "phosphor-react";
+import { Heart, SignOut } from "phosphor-react";
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import axios from 'axios'
 
 const MAX_CHAR_TWEET = 180
 
-function TweetForm({loggedInUser, onSuccess}) {
+function TweetForm({loggedInUser, onSuccess, setUser}) {
     
   const formik = useFormik({
     onSubmit: async (values, form) => {
@@ -22,12 +22,21 @@ function TweetForm({loggedInUser, onSuccess}) {
     initialValues: {text: ''}
   })
 
+  function logout() {
+    setUser(null)
+  }
+
   return (
     <>
       <div className="border-b border-silver p-4 space-y-6 ">
+        <div className="flex justify-between">
+          <h2 className="font-bold text-4xl">Bem vindo, { loggedInUser.name } (@{loggedInUser.username})!</h2>
+          <button className="bg-birdBlue px-3 py-3 rounded-full disabled:opacity-50" onClick={logout}><SignOut/></button>
+        </div>
+
         <div className="flex space-x-5">
           <img src='./src/avatar.png' className="w-7" />
-          <h1 className="font-bold text-xl">Página Inicial</h1>
+          <h1 className="font-bold text-2xl">Página Inicial</h1>
         </div>
         <form className="pl-12 text-lg flex flex-col" onSubmit={formik.handleSubmit}>
           <textarea
@@ -63,7 +72,7 @@ function Tweet({ name, username, avatar, tweet, likes }) {
         <span className="font-bold text-sm">{name}</span>{' '}
         <span className="text-sm text-silver">@{username}</span>
         
-        <p>{tweet}</p>
+        <p className="max-w-lg md:max-w-2xl lg:max-w-6xl break-all">{tweet}</p>
         <div className="flex space-x-1 text-silver text-sm items-center">
           <Heart className="h-4 stroke-1" />
           <span>{likes}</span>
@@ -75,7 +84,7 @@ function Tweet({ name, username, avatar, tweet, likes }) {
 
 
 
-export function Home({loggedInUser}) {
+export function Home({loggedInUser, setUser}) {
   const [data, setData] = useState('')
 
   async function fetchData() {
@@ -94,7 +103,7 @@ export function Home({loggedInUser}) {
   
   return (
     <>
-      <TweetForm loggedInUser={loggedInUser} onSuccess={fetchData} />
+      <TweetForm loggedInUser={loggedInUser} onSuccess={fetchData} setUser={setUser}/>
       <div>
         {data.length > 0
           ? data.map(tweet => (
