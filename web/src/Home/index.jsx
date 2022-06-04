@@ -63,14 +63,13 @@ function Tweet({ name, username, avatar, tweet, likes }) {
 
 
 
-export function Home() {
-  const token = ''
+export function Home({loggedInUser}) {
   const [data, setData] = useState('')
 
   async function fetchData() {
     const res = await axios.get('http://localhost:9000/tweets', {
       headers: {
-        authorization: `Bearer ${token}`
+        authorization: `Bearer ${loggedInUser.accessToken}`
       }
     })
     setData(res.data)
@@ -87,7 +86,7 @@ export function Home() {
       <div>
         {data.length && data.map(tweet => (
           <Tweet
-            key={btoa(Date.now() + '_' + tweet.text)}
+            key={tweet.id}
             name={tweet.user.name}
             username={tweet.user.username}
             avatar='./src/avatar.png'
