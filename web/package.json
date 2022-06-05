@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
+    "formik": "^2.2.9",
     "phosphor-react": "^1.4.1",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.2",
