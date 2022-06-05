@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run build --output public"
+    "build": "node server.js"
   },
   "author": "Leonardo Esperança",
   "license": "ISC",
