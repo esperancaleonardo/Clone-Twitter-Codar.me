@@ -1,4 +1,4 @@
-import { Heart, SignOut } from "phosphor-react";
+import { Heart, SignOut, X } from "phosphor-react";
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import axios from 'axios'
@@ -63,12 +63,22 @@ function TweetForm({loggedInUser, onSuccess, setUser}) {
   )
 }
 
-function Tweet({ id, name, username, avatar, tweet, likes, date }) {
+function Tweet({ id, name, username, avatar, tweet, likes, date, loggedUser, tweetUserId, onSuccess }) {
   const [likedTweet, setLikedTweet] = useState(likes)
+  const [deletedTweet, setDeletedTweet] = useState(id)
+  
 
   async function updateTweet() {
     const res = await axios.post(`${import.meta.env.VITE_API_HOST}/tweet/${id}`)
     setLikedTweet(res.data.likes)
+  }
+
+  async function deleteTweet() {
+    const res = await axios.delete(`${import.meta.env.VITE_API_HOST}/tweet/${deletedTweet}`, {
+      headers:{'authorization': `Bearer ${loggedUser.accessToken}`},
+    })
+    setDeletedTweet(res.data.id)
+    onSuccess()
   }
 
   return (
@@ -80,12 +90,17 @@ function Tweet({ id, name, username, avatar, tweet, likes, date }) {
         <span className="font-bold text-md">{name}</span>{' '}
         <span className="text-sm text-silver">@{username}</span>
         <span className="text-xs text-silver"> em {date.slice(0, 10)} às </span>
-        <span className="text-xs text-silver">{date.slice(11,16)}</span>
+        <span className="text-xs text-silver">{date.slice(11, 16)}</span>
+        {
+          tweetUserId === loggedUser.id
+            ? <button type="button" className="bg-birdBlue rounded-md font-bold px-2 py-0 flex justify-start items-center text-xs text-black cursor-pointer" onClick={deleteTweet}>APAGAR</button>
+            : null }
+
         
         
         <p className="max-w-lg md:max-w-2xl lg:max-w-6xl break-all">{tweet}</p>
         <div className="flex space-x-1 text-silver text-sm items-center">
-          <div onClick={() => {updateTweet()}}><Heart className="h-4 stroke-1" /></div>
+          <div onClick={() => {updateTweet()}}><Heart className="h-4 stroke-1  cursor-pointer" /></div>
           <span className="text-sm pl-2">{new Intl.NumberFormat('en-GB', { notation: "compact", compactDisplay: "short" }).format(likedTweet)}</span>
         </div>
       </div>
@@ -121,12 +136,15 @@ export function Home({loggedInUser, setUser}) {
                 <Tweet
                 key={tweet.id}
                 id={tweet.id}
+                tweetUserId={tweet.user.id}
+                loggedUser={loggedInUser}
                 name={tweet.user.name}
                 username={tweet.user.username}
                 avatar={tweet.user.avatar}
                 tweet={tweet.text}
                 likes={tweet.likes}
-                date={tweet.date} />
+                date={tweet.date}
+                onSuccess={fetchData}/>
               ))
             : <div className="flex justify-center items-center w-full p-12">
                 <h1 className="text-3xl ">Ops! Ainda não há tweets!</h1>
