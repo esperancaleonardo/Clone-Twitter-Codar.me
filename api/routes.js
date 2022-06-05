@@ -57,7 +57,8 @@ router.post('/tweet', async ctx => {
       data: {
         userId: user.id,
         text: ctx.request.body.text,
-        likes: 0
+        likes: 0,
+        date: new Date()
       }
     })
 

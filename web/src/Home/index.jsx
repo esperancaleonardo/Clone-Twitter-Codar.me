@@ -63,7 +63,7 @@ function TweetForm({loggedInUser, onSuccess, setUser}) {
   )
 }
 
-function Tweet({ id, name, username, avatar, tweet, likes }) {
+function Tweet({ id, name, username, avatar, tweet, likes, date }) {
   const [likedTweet, setLikedTweet] = useState(likes)
 
   async function updateTweet() {
@@ -77,8 +77,11 @@ function Tweet({ id, name, username, avatar, tweet, likes }) {
         <img className="rounded-full" src={avatar} />
       </div>
       <div className="space-y-1 p-auto w-lg">
-        <span className="font-bold text-sm">{name}</span>{' '}
+        <span className="font-bold text-md">{name}</span>{' '}
         <span className="text-sm text-silver">@{username}</span>
+        <span className="text-xs text-silver"> em {date.slice(0, 10)} às </span>
+        <span className="text-xs text-silver">{date.slice(11,16)}</span>
+        
         
         <p className="max-w-lg md:max-w-2xl lg:max-w-6xl break-all">{tweet}</p>
         <div className="flex space-x-1 text-silver text-sm items-center">
@@ -89,7 +92,6 @@ function Tweet({ id, name, username, avatar, tweet, likes }) {
     </div>
   )
 }
-
 
 
 export function Home({loggedInUser, setUser}) {
@@ -123,7 +125,8 @@ export function Home({loggedInUser, setUser}) {
                 username={tweet.user.username}
                 avatar={tweet.user.avatar}
                 tweet={tweet.text}
-                likes={tweet.likes}/>
+                likes={tweet.likes}
+                date={tweet.date} />
               ))
             : <div className="flex justify-center items-center w-full p-12">
                 <h1 className="text-3xl ">Ops! Ainda não há tweets!</h1>
