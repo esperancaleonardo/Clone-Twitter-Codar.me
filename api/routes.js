@@ -117,6 +117,9 @@ router.post('/signup', async ctx => {
   try {
     const user = await prisma.user.create({
       data: {
+        avatar: `https://randomuser.me/api/portraits/med/men/${Math.floor(
+          Math.random() * 100
+        )}.jpg`,
         name: ctx.request.body.name,
         username: ctx.request.body.username,
         email: ctx.request.body.email,
@@ -182,6 +185,7 @@ router.get('/login', async ctx => {
     delete user.password
     ctx.body = {
       id: user.id,
+      avatar: user.avatar,
       name: user.name,
       username: user.username,
       email: user.email,

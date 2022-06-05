@@ -36,7 +36,7 @@ function TweetForm({loggedInUser, onSuccess, setUser}) {
         </div>
 
         <div className="flex space-x-5">
-          <img src='./src/avatar.png' className="w-7" />
+          <img className="rounded-full w-10" src={loggedInUser.avatar} />
           <h1 className="font-bold text-2xl">Página Inicial</h1>
         </div>
         <form className="pl-12 text-lg flex flex-col" onSubmit={formik.handleSubmit}>
@@ -63,19 +63,18 @@ function TweetForm({loggedInUser, onSuccess, setUser}) {
   )
 }
 
-function Tweet({ id, name, username, avatar, tweet, likes}) {
-
+function Tweet({ id, name, username, avatar, tweet, likes }) {
   const [likedTweet, setLikedTweet] = useState(likes)
 
   async function updateTweet() {
-    setLikedTweet(likedTweet+1)
-    await axios.post(`${import.meta.env.VITE_API_HOST}/tweet/${id}`)
-  } 
+    const res = await axios.post(`${import.meta.env.VITE_API_HOST}/tweet/${id}`)
+    setLikedTweet(res.data.likes)
+  }
 
   return (
     <div className="flex space-x-3 p-4 border-b border-silver">
       <div>
-        <img src={avatar} />
+        <img className="rounded-full" src={avatar} />
       </div>
       <div className="space-y-1 p-auto w-lg">
         <span className="font-bold text-sm">{name}</span>{' '}
@@ -122,7 +121,7 @@ export function Home({loggedInUser, setUser}) {
                 id={tweet.id}
                 name={tweet.user.name}
                 username={tweet.user.username}
-                avatar='./src/avatar.png'
+                avatar={tweet.user.avatar}
                 tweet={tweet.text}
                 likes={tweet.likes}/>
               ))
