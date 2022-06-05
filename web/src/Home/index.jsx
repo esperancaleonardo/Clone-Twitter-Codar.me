@@ -130,6 +130,9 @@ export function Home({loggedInUser, setUser}) {
     <>
       <div className="flex flex-col justify-center md:items-center w-full md:max-w-4xl md:mx-auto md:border-x-2 md:border-silver border-b-2">
         <TweetForm loggedInUser={loggedInUser} onSuccess={fetchData} setUser={setUser}/>
+
+
+
         <div className="w-full">
           {data.length > 0
             ? data.map(tweet => (
@@ -151,6 +154,15 @@ export function Home({loggedInUser, setUser}) {
               </div>
           }
         </div>
+        <footer className="text-xs text-white">
+          Feito na base do ☕ por{" "}
+          <a
+          className="underline underline-offset-2"
+          href="https://www.linkedin.com/in/leonardo-esperanca/"
+          >
+          Leonardo Esperança
+          </a>
+        </footer>
       </div>
       
     </>
