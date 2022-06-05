@@ -68,6 +68,23 @@ router.post('/tweet', async ctx => {
   }
 })
 
+//curtir o tweet
+router.post('/tweet/:id', async ctx => {
+  const tweet = await prisma.tweet.findFirst({
+    where: { id: ctx.params.id },
+    select: { likes: true, id: true, userId: true }
+  })
+
+  await prisma.tweet.update({
+    where: { id: ctx.params.id },
+    data: { likes: tweet.likes + 1 }
+  })
+
+  ctx.body = tweet
+  ctx.status = 200
+  return
+})
+
 // deletar o tweet
 router.delete('/tweet/:id', async ctx => {
   const [, token] = ctx.request.headers?.authorization?.split(' ') || []
