@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import axios from 'axios'
 
-const MAX_CHAR_TWEET = 180
+const MAX_CHAR_TWEET = import.meta.env.VITE_MAX_CHAR_TWEET
 
 function TweetForm({loggedInUser, onSuccess, setUser}) {
     
@@ -29,9 +29,9 @@ function TweetForm({loggedInUser, onSuccess, setUser}) {
   return (
     <>
       <div className="border-b border-silver p-4 space-y-6 ">
-        <div className="flex justify-between">
-          <h2 className="font-bold text-4xl">Bem vindo, { loggedInUser.name } (@{loggedInUser.username})!</h2>
-          <button className="bg-birdBlue px-3 py-3 rounded-full disabled:opacity-50" onClick={logout}><SignOut/></button>
+        <div className="flex justify-between gap-10">
+          <div><h2 className="font-bold text-3xl">Bem vindo, { loggedInUser.name } (@{loggedInUser.username})!</h2></div>
+          <div><button className="bg-birdBlue px-3 py-3 rounded-full disabled:opacity-50" onClick={logout}><SignOut/></button></div>
         </div>
 
         <div className="flex space-x-5">
@@ -54,7 +54,7 @@ function TweetForm({loggedInUser, onSuccess, setUser}) {
             <button
               type="submit"
               className="bg-birdBlue px-5 py-2 rounded-full disabled:opacity-50"
-              disabled={formik.values.text.length > MAX_CHAR_TWEET || formik.isSubmitting}>Tweetar</button>
+              disabled={formik.values.text.length == 0 || formik.values.text.length > MAX_CHAR_TWEET || formik.isSubmitting}>Tweetar</button>
          </div>
         </form>
       </div>
@@ -62,7 +62,12 @@ function TweetForm({loggedInUser, onSuccess, setUser}) {
   )
 }
 
-function Tweet({ name, username, avatar, tweet, likes }) {
+function Tweet({ id, name, username, avatar, tweet, likes }) {
+
+  function like(tweetId) {
+    console.log(tweetId)
+  }
+
   return (
     <div className="flex space-x-3 p-4 border-b border-silver">
       <div>
@@ -74,7 +79,7 @@ function Tweet({ name, username, avatar, tweet, likes }) {
         
         <p className="max-w-lg md:max-w-2xl lg:max-w-6xl break-all">{tweet}</p>
         <div className="flex space-x-1 text-silver text-sm items-center">
-          <Heart className="h-4 stroke-1" />
+          <Heart className="h-4 stroke-1" onClick={() => {like(id)}}/>
           <span>{likes}</span>
         </div>
       </div>
@@ -103,22 +108,25 @@ export function Home({loggedInUser, setUser}) {
   
   return (
     <>
-      <TweetForm loggedInUser={loggedInUser} onSuccess={fetchData} setUser={setUser}/>
-      <div>
-        {data.length > 0
-          ? data.map(tweet => (
-              <Tweet
-                key={tweet.id}
-                name={tweet.user.name}
-                username={tweet.user.username}
-                avatar='./src/avatar.png'
-                tweet={tweet.text}
-                likes={tweet.likes} />
-            ))
-          : <div className="flex justify-center items-center w-full p-12">
-              <h1 className="text-3xl ">Ops! Ainda não há tweets!</h1>
-            </div>
-        }
+      <div className="flex flex-col justify-center md:items-center w-full md:max-w-4xl md:mx-auto md:border-x-2 md:border-silver">
+        <TweetForm loggedInUser={loggedInUser} onSuccess={fetchData} setUser={setUser}/>
+        <div>
+          {data.length > 0
+            ? data.map(tweet => (
+                <Tweet
+                  key={tweet.id}
+                  id={tweet.id}
+                  name={tweet.user.name}
+                  username={tweet.user.username}
+                  avatar='./src/avatar.png'
+                  tweet={tweet.text}
+                  likes={tweet.likes} />
+              ))
+            : <div className="flex justify-center items-center w-full p-12">
+                <h1 className="text-3xl ">Ops! Ainda não há tweets!</h1>
+              </div>
+          }
+        </div>
       </div>
       
     </>
