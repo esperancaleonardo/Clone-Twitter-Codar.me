@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import axios from 'axios'
 
+
 const MAX_CHAR_TWEET = import.meta.env.VITE_MAX_CHAR_TWEET
 
 function TweetForm({loggedInUser, onSuccess, setUser}) {
@@ -28,7 +29,7 @@ function TweetForm({loggedInUser, onSuccess, setUser}) {
 
   return (
     <>
-      <div className="border-b border-silver p-4 space-y-6 ">
+      <div className="border-b border-silver p-4 space-y-6 w-full">
         <div className="flex justify-between gap-10">
           <div><h2 className="font-bold text-3xl">Bem vindo, { loggedInUser.name } (@{loggedInUser.username})!</h2></div>
           <div><button className="bg-birdBlue px-3 py-3 rounded-full disabled:opacity-50" onClick={logout}><SignOut/></button></div>
@@ -62,25 +63,28 @@ function TweetForm({loggedInUser, onSuccess, setUser}) {
   )
 }
 
-function Tweet({ id, name, username, avatar, tweet, likes }) {
+function Tweet({ id, name, username, avatar, tweet, likes}) {
 
-  function like(tweetId) {
-    console.log(tweetId)
-  }
+  const [likedTweet, setLikedTweet] = useState(likes)
+
+  async function updateTweet() {
+    setLikedTweet(likedTweet+1)
+    await axios.post(`${import.meta.env.VITE_API_HOST}/tweet/${id}`)
+  } 
 
   return (
     <div className="flex space-x-3 p-4 border-b border-silver">
       <div>
         <img src={avatar} />
       </div>
-      <div className="space-y-1">
+      <div className="space-y-1 p-auto w-lg">
         <span className="font-bold text-sm">{name}</span>{' '}
         <span className="text-sm text-silver">@{username}</span>
         
         <p className="max-w-lg md:max-w-2xl lg:max-w-6xl break-all">{tweet}</p>
         <div className="flex space-x-1 text-silver text-sm items-center">
-          <Heart className="h-4 stroke-1" onClick={() => {like(id)}}/>
-          <span>{likes}</span>
+          <div onClick={() => {updateTweet()}}><Heart className="h-4 stroke-1" /></div>
+          <span className="text-sm pl-2">{new Intl.NumberFormat('en-GB', { notation: "compact", compactDisplay: "short" }).format(likedTweet)}</span>
         </div>
       </div>
     </div>
@@ -108,19 +112,19 @@ export function Home({loggedInUser, setUser}) {
   
   return (
     <>
-      <div className="flex flex-col justify-center md:items-center w-full md:max-w-4xl md:mx-auto md:border-x-2 md:border-silver">
+      <div className="flex flex-col justify-center md:items-center w-full md:max-w-4xl md:mx-auto md:border-x-2 md:border-silver border-b-2">
         <TweetForm loggedInUser={loggedInUser} onSuccess={fetchData} setUser={setUser}/>
-        <div>
+        <div className="w-full">
           {data.length > 0
             ? data.map(tweet => (
                 <Tweet
-                  key={tweet.id}
-                  id={tweet.id}
-                  name={tweet.user.name}
-                  username={tweet.user.username}
-                  avatar='./src/avatar.png'
-                  tweet={tweet.text}
-                  likes={tweet.likes} />
+                key={tweet.id}
+                id={tweet.id}
+                name={tweet.user.name}
+                username={tweet.user.username}
+                avatar='./src/avatar.png'
+                tweet={tweet.text}
+                likes={tweet.likes}/>
               ))
             : <div className="flex justify-center items-center w-full p-12">
                 <h1 className="text-3xl ">Ops! Ainda não há tweets!</h1>

@@ -80,7 +80,7 @@ router.post('/tweet/:id', async ctx => {
     data: { likes: tweet.likes + 1 }
   })
 
-  ctx.body = tweet
+  ctx.body = { likes: tweet.likes + 1, id: tweet.id, userId: tweet.userId }
   ctx.status = 200
   return
 })
